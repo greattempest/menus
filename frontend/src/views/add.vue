@@ -8,6 +8,7 @@ const form = ref({
   material: '',
   tag: '',
   image: '',
+  video: '',
   step: '',
   energy: '',
 })
@@ -165,6 +166,12 @@ const submitForm = async () => {
           <input type="file" accept="image/*" :disabled="uploading" @change="uploadImage" />
           <small v-if="uploading">图片上传中...</small>
           <img v-if="imagePreview || form.image" class="image-preview" :src="imagePreview || form.image" alt="食谱预览" />
+        </label>
+
+        <label class="form-field form-field-wide">
+          <span>视频链接</span>
+          <input v-model="form.video" type="url" placeholder="支持 B 站、YouTube 或 MP4 等视频链接" />
+          <small>请输入完整的视频页面地址或可直接播放的视频文件地址</small>
         </label>
 
         <label class="form-field form-field-wide">

@@ -6,8 +6,39 @@ const route = useRoute()
 const router = useRouter()
 const menu = ref(null)
 const loading = ref(true)
-const uploading = ref(false)
 const error = ref('')
+
+const getVideoSource = (value) => {
+  if (!value) {
+    return { type: 'unsupported', url: '' }
+  }
+
+  try {
+    const parsed = new URL(value)
+    const hostname = parsed.hostname.toLowerCase()
+    const youtubeId = parsed.searchParams.get('v')
+      || parsed.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)?.[1]
+      || (hostname === 'youtu.be' ? parsed.pathname.slice(1).split('/')[0] : '')
+
+    if (youtubeId && ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'].includes(hostname)) {
+      return { type: 'iframe', url: `https://www.youtube.com/embed/${encodeURIComponent(youtubeId)}` }
+    }
+
+    const bilibiliId = parsed.pathname.match(/\/video\/(BV[\w]+|av\d+)/i)?.[1]
+    if (bilibiliId && ['bilibili.com', 'www.bilibili.com', 'm.bilibili.com'].includes(hostname)) {
+      const parameter = bilibiliId.toLowerCase().startsWith('av') ? 'aid' : 'bvid'
+      return { type: 'iframe', url: `https://player.bilibili.com/player.html?${parameter}=${encodeURIComponent(bilibiliId)}&page=1` }
+    }
+
+    if (/\.(mp4|webm|ogg)(?:\?.*)?$/i.test(parsed.pathname)) {
+      return { type: 'video', url: parsed.href }
+    }
+  } catch {
+    return { type: 'unsupported', url: value }
+  }
+
+  return { type: 'unsupported', url: value }
+}
 
 const formatValue = (value) => {
   if (value === null || value === undefined || value === '') {
@@ -17,11 +48,7 @@ const formatValue = (value) => {
   return String(value)
 }
 
-const openVideo = () => {
-  if (menu.value?.video) {
-    window.open(menu.value.video, '_blank', 'noopener,noreferrer')
-  }
-}
+const videoSource = () => getVideoSource(menu.value?.video)
 
 onMounted(async () => {
   const menuId = route.params.id
@@ -44,47 +71,6 @@ onMounted(async () => {
     loading.value = false
   }
 })
-
-const uploadImage = async (event) => {
-  const file = event.target.files?.[0]
-  if (!file) {
-    return
-  }
-
-  if (!file.type.startsWith('image/')) {
-    error.value = '请选择图片文件'
-    event.target.value = ''
-    return
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    error.value = '图片大小不能超过 5MB'
-    event.target.value = ''
-    return
-  }
-
-  uploading.value = true
-  error.value = ''
-  imagePreview.value = URL.createObjectURL(file)
-
-  try {
-    const body = new FormData()
-    body.append('file', file)
-    const response = await fetch('/api/uploads', { method: 'POST', body })
-    if (!response.ok) {
-      throw new Error(await getResponseError(response))
-    }
-
-    const result = await response.json()
-    form.value.image = result.url
-  } catch (err) {
-    imagePreview.value = ''
-    error.value = err.message || '图片上传失败'
-  } finally {
-    uploading.value = false
-    event.target.value = ''
-  }
-}
 
 const goBack = () => {
   router.push('/')
@@ -113,7 +99,6 @@ const goBack = () => {
             <h1>{{ menu.name || '未命名菜单' }}</h1>
             <div class="meta-row">
               <span class="tag-pill">编号：{{ formatValue(menu.code) }}</span>
-              <span class="tag-pill status-pill">状态：{{ formatValue(menu.status) }}</span>
             </div>
 
             <div class="summary-grid">
@@ -136,9 +121,24 @@ const goBack = () => {
             </div>
 
             <div class="hero-actions">
-              <button class="primary-button" @click="openVideo" :disabled="!menu.video">播放视频</button>
+              <a v-if="menu.video && videoSource().type === 'unsupported'" class="primary-button" :href="menu.video"
+                target="_blank" rel="noopener noreferrer">打开视频</a>
             </div>
           </div>
+        </section>
+
+        <section v-if="menu.video" class="video-section">
+          <div class="card-title">在线视频</div>
+          <div v-if="videoSource().type === 'iframe'" class="video-frame-wrap">
+            <iframe :src="videoSource().url" title="菜单在线视频" class="video-frame"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+          </div>
+          <video v-else-if="videoSource().type === 'video'" class="video-player" controls preload="metadata">
+            <source :src="videoSource().url" />
+            当前浏览器不支持视频播放。
+          </video>
+          <p v-else class="video-fallback">该网站不支持直接嵌入播放，请点击“打开视频”在新窗口观看。</p>
         </section>
 
         <section class="info-grid">
