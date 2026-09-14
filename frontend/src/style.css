@@ -36,6 +36,42 @@ select {
   padding: 24px;
 }
 
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.login-panel {
+  width: min(100%, 430px);
+  padding: 42px;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+}
+
+.login-panel h1 {
+  margin-top: 8px;
+}
+
+.login-intro {
+  margin: 8px 0 28px;
+  color: #64748b;
+}
+
+.login-form {
+  display: grid;
+  gap: 18px;
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
 .app-shell {
   width: 100%;
   max-width: 1200px;

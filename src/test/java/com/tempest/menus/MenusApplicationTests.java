@@ -1,8 +1,12 @@
 package com.tempest.menus;
 
 import com.tempest.menus.entity.Menus;
+import com.tempest.menus.dto.UserRequest;
+import com.tempest.menus.entity.User;
 import com.tempest.menus.repository.MenusRepository;
+import com.tempest.menus.repository.RoleRepository;
 import com.tempest.menus.service.MenusService;
+import com.tempest.menus.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +26,15 @@ class MenusApplicationTests {
 
     @InjectMocks
     private MenusService menusService;
+
+    @Mock
+    private com.tempest.menus.repository.UserRepository userRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @InjectMocks
+    private UserService userService;
 
     @Test
     void shouldSearchByKeywordAcrossNameMaterialAndTag() {
@@ -49,5 +62,20 @@ class MenusApplicationTests {
         List<Menus> result = menusService.findByKeyword("   ");
 
         assertThat(result).containsExactly(menu);
+    }
+
+    @Test
+    void shouldHashPasswordWhenCreatingUser() {
+        UserRequest request = new UserRequest();
+        request.setUsername("admin");
+        request.setPassword("secret");
+        when(userRepository.existsByUsername("admin")).thenReturn(false);
+        when(userRepository.save(org.mockito.ArgumentMatchers.any(User.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        User user = userService.create(request);
+
+        assertThat(user.getPasswordHash()).startsWith("$2").isNotEqualTo("secret");
+        assertThat(user.getUsername()).isEqualTo("admin");
     }
 }

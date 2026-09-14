@@ -1,6 +1,7 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { auth } from '../auth'
 
 const router = useRouter()
 const menus = ref([])
@@ -9,7 +10,11 @@ const error = ref('')
 const page = ref(1)
 const searchQuery = ref('')
 const showActionMenu = ref(false)
+let authCheckTimer
 const pageSize = 9
+const canCreate = computed(() => auth.hasPermission('menu:create'))
+const canUpdate = computed(() => auth.hasPermission('menu:update'))
+const canDelete = computed(() => auth.hasPermission('menu:delete'))
 
 const filteredMenus = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
@@ -78,6 +83,11 @@ const goToAdd = () => {
   router.push({ name: 'Add' })
 }
 
+const logout = async () => {
+  showActionMenu.value = false
+  await auth.logout()
+}
+
 const goToDetail = (menu) => {
   const id = menu?.id ?? menu?.code
   if (id === undefined || id === null || id === '') {
@@ -136,8 +146,16 @@ watch(
   }
 )
 
-onMounted(() => {
-  fetchMenus()
+onMounted(async () => {
+  await auth.load()
+  await fetchMenus()
+  authCheckTimer = window.setInterval(() => {
+    auth.load()
+  }, 60 * 1000)
+})
+
+onBeforeUnmount(() => {
+  window.clearInterval(authCheckTimer)
 })
 </script>
 
@@ -157,9 +175,13 @@ onMounted(() => {
             <span></span>
           </button>
           <div v-if="showActionMenu" class="action-menu">
-            <button class="action-menu-item" type="button" @click="goToAdd">
+            <button v-if="canCreate" class="action-menu-item" type="button" @click="goToAdd">
               <span class="action-menu-icon">+</span>
               <span>新增食谱</span>
+            </button>
+            <button v-if="auth.isLoggedIn()" class="action-menu-item" type="button" @click="logout">
+              <span class="action-menu-icon">↪</span>
+              <span>退出登录</span>
             </button>
           </div>
         </div>
@@ -186,8 +208,8 @@ onMounted(() => {
               <div class="card-actions">
                 <!--button class="mini-action" @click.stop="goToDetail(menu)">原版</button-->
                 <button class="mini-action accent" @click.stop="goToCardDetail(menu)">详情</button>
-                <button class="mini-action" @click.stop="goToEdit(menu)">编辑</button>
-                <button class="mini-action danger" @click.stop="deleteMenu(menu)">删除</button>
+                <button v-if="canUpdate" class="mini-action" @click.stop="goToEdit(menu)">编辑</button>
+                <button v-if="canDelete" class="mini-action danger" @click.stop="deleteMenu(menu)">删除</button>
               </div>
             </div>
           </article>
