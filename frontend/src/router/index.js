@@ -5,6 +5,7 @@ import EditPage from '../views/edit.vue'
 import DetailPage from '../views/detail.vue'
 import DetailCardPage from '../views/detail-card.vue'
 import LoginPage from '../views/login.vue'
+import NotePage from '../components/note.vue'
 import { auth } from '../auth'
 
 const routes = [
@@ -39,6 +40,11 @@ const routes = [
     path: '/detail-card/:id',
     name: 'DetailCard',
     component: DetailCardPage,
+  },
+  {
+    path: '/note',
+    name: 'Note',
+    component: NotePage,
   },
 ]
 
