@@ -2,11 +2,13 @@ com\tempest\menus\dto\UserResponse.class
 com\tempest\menus\repository\UserRepository.class
 com\tempest\menus\entity\Permission.class
 com\tempest\menus\service\AuthService.class
+com\tempest\menus\controller\MaterialsController$TableMetadata.class
 com\tempest\menus\entity\Menus.class
 com\tempest\menus\repository\MenusRepository.class
 com\tempest\menus\controller\RoleController.class
 com\tempest\menus\MenusApplication.class
 com\tempest\menus\entity\User.class
+com\tempest\menus\controller\MaterialsController.class
 com\tempest\menus\controller\PermissionController.class
 com\tempest\menus\controller\AuthController.class
 com\tempest\menus\dto\LoginRequest.class
@@ -17,6 +19,7 @@ com\tempest\menus\config\PermissionInterceptor.class
 com\tempest\menus\controller\UserController.class
 com\tempest\menus\config\WebMvcConfig.class
 com\tempest\menus\service\RoleService.class
+com\tempest\menus\controller\MaterialsController$ColumnMetadata.class
 com\tempest\menus\repository\PermissionRepository.class
 com\tempest\menus\dto\UserRequest.class
 com\tempest\menus\service\UserService.class

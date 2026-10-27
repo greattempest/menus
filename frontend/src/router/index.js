@@ -5,6 +5,8 @@ import EditPage from '../views/edit.vue'
 import DetailPage from '../views/detail.vue'
 import DetailCardPage from '../views/detail-card.vue'
 import LoginPage from '../views/login.vue'
+import MaterialPage from '../views/material.vue'
+import CalcPage from '../views/calc.vue'
 import NotePage from '../components/note.vue'
 import { auth } from '../auth'
 
@@ -24,6 +26,20 @@ const routes = [
     name: 'Add',
     component: AddPage,
     meta: { requiresAuth: true, permission: 'menu:create' },
+  },
+  {
+    path: '/material',
+    name: 'Material',
+    component: MaterialPage,
+    meta: {
+      requiresAuth: true,
+      permissions: ['menu:create', 'menu:update', 'menu:delete'],
+    },
+  },
+  {
+    path: '/calc',
+    name: 'Calc',
+    component: CalcPage,
   },
   {
     path: '/edit/:id',
@@ -67,6 +83,10 @@ router.beforeEach(async (to) => {
 
   const permission = to.meta.permission
   if (permission && !auth.hasPermission(permission)) {
+    return { name: 'List' }
+  }
+  const permissions = to.meta.permissions
+  if (permissions && !permissions.some((requiredPermission) => auth.hasPermission(requiredPermission))) {
     return { name: 'List' }
   }
   return true

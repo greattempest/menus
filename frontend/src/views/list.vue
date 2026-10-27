@@ -15,6 +15,7 @@ const pageSize = 9
 const canCreate = computed(() => auth.hasPermission('menu:create'))
 const canUpdate = computed(() => auth.hasPermission('menu:update'))
 const canDelete = computed(() => auth.hasPermission('menu:delete'))
+const canManageMaterials = computed(() => canCreate.value || canUpdate.value || canDelete.value)
 
 const filteredMenus = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
@@ -81,6 +82,16 @@ const onSearchInput = async () => {
 const goToAdd = () => {
   showActionMenu.value = false
   router.push({ name: 'Add' })
+}
+
+const goToMaterial = () => {
+  showActionMenu.value = false
+  router.push({ name: 'Material' })
+}
+
+const goToCalculator = () => {
+  showActionMenu.value = false
+  router.push({ name: 'Calc' })
 }
 
 const logout = async () => {
@@ -178,6 +189,14 @@ onBeforeUnmount(() => {
             <button v-if="canCreate" class="action-menu-item" type="button" @click="goToAdd">
               <span class="action-menu-icon">+</span>
               <span>新增食谱</span>
+            </button>
+            <button v-if="canManageMaterials" class="action-menu-item" type="button" @click="goToMaterial">
+              <span class="action-menu-icon">+</span>
+              <span>食材管理</span>
+            </button>
+            <button class="action-menu-item" type="button" @click="goToCalculator">
+              <span class="action-menu-icon">∑</span>
+              <span>菜肴热量计算器</span>
             </button>
             <button v-if="auth.isLoggedIn()" class="action-menu-item" type="button" @click="logout">
               <span class="action-menu-icon">↪</span>

@@ -2,6 +2,7 @@ C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\config\AdminInitializer
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\config\PermissionInterceptor.java
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\config\WebMvcConfig.java
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\controller\AuthController.java
+C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\controller\MaterialsController.java
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\controller\MenusController.java
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\controller\PermissionController.java
 C:\Users\zhou_\git\menus\src\main\java\com\tempest\menus\controller\RoleController.java

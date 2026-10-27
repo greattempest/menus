@@ -21,7 +21,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
     String path = request.getRequestURI();
-    if ((!path.startsWith("/api/menus") && !path.equals("/api/uploads"))
+    if ((!path.startsWith("/api/menus") && !path.startsWith("/api/materials") && !path.equals("/api/uploads"))
       || HttpMethod.GET.matches(request.getMethod())) {
       return true;
     }
